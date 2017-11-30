@@ -17,6 +17,22 @@ if (typeof process.env.NEO4J_PASSWORD === 'undefined') {
   console.warn('WARNING: process.env.NEO4J_PASSWORD is not defined. Check README.md for more information');
 }
 
+console.log(`Connected to ${process.env.NEO4J_URI} as ${process.env.NEO4J_USER}`);
+
+server.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+   //intercepts OPTIONS method
+   if ('OPTIONS' === req.method) {
+    // respond with 200
+    res.send(200);
+  }
+  else {
+    // move on
+    next();
+  }
+});
+
 server.use('/graphql', bodyParser.json(), graphqlExpress(request => ({
   schema,
   rootValue,

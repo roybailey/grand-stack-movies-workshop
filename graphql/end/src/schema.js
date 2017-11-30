@@ -21,11 +21,11 @@ const typeDefs = `
   poster: String
   imdbRating: Float
   genres: [String]
-  similar(first: Int=3, offset:Int=0): [Movie]
+  similar(limit: Int=3, offset:Int=0): [Movie]
 }
 
 type Query {
-  moviesByTitle(subString: String!, first: Int=3, offset: Int=0): [Movie]
+  moviesByTitle(title: String!, limit: Int=3, offset: Int=0): [Movie]
 }
 `;
 
@@ -34,7 +34,7 @@ const resolvers = {
   Query: {
     moviesByTitle: (root, args, context) => {
       let session = context.driver.session();
-      let query = "MATCH (movie:Movie) WHERE movie.title CONTAINS $subString RETURN movie LIMIT $first;"
+      let query = "MATCH (movie:Movie) WHERE movie.title CONTAINS $title RETURN movie LIMIT $limit;"
       return session.run(query, args)
         .then( result => { return result.records.map(record => { return record.get("movie").properties })})
     },
@@ -57,13 +57,13 @@ const resolvers = {
       let session = context.driver.session();
       let params = {movieId: movie.movieId};
       let query = `
-				MATCH (m:Movie) WHERE m.movieId = $movieId
-        MATCH (m)-[:IN_GENRE]->(g:Genre)<-[:IN_GENRE]-(movie:Movie)
-        WITH m, movie, COUNT(*) AS genreOverlap
-        MATCH (m)<-[:RATED]-(:User)-[:RATED]->(movie:Movie)
-        WITH movie,genreOverlap, COUNT(*) AS userRatedScore
-        RETURN movie ORDER BY (0.9 * genreOverlap) + (0.1 * userRatedScore)  DESC LIMIT 3
-			`;
+            MATCH (m:Movie) WHERE m.movieId = $movieId
+            MATCH (m)-[:IN_GENRE]->(g:Genre)<-[:IN_GENRE]-(movie:Movie)
+            WITH m, movie, COUNT(*) AS genreOverlap
+            MATCH (m)<-[:RATED]-(:User)-[:RATED]->(movie:Movie)
+            WITH movie,genreOverlap, COUNT(*) AS userRatedScore
+            RETURN movie ORDER BY (0.9 * genreOverlap) + (0.1 * userRatedScore)  DESC LIMIT 3
+        `;
       
       return session.run(query, params)
       	.then( result => {return result.records.map(record => {return record.get("movie").properties})})

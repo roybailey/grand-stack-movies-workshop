@@ -1,24 +1,37 @@
 # GRAND Stack Workshop
 
+## Workshop Steps Completed
+
+* Cloned `https://github.com/grand-stack/grand-stack-movies-workshop`
+* Downloaded recommendations database (see Setup Neo4j recommendations database)
+* Ran the GraphQL template
+* Ran the react-apollo template
+* Modified the react-apollo template to point to local GraphQL instance
+* Modified the GraphQL moviesByTitle to take `title` instead of `subString`
+* Modified the react-apollo to call `moviesByTitle`
+
+#### Setup Neo4j recommendations database
+
+```
+curl https://s3.amazonaws.com/neo4j-sandbox-usecase-datastores/v3_2/recommendations.db.zip > /tmp/recommandations.zip
+unzip recommendations.zip
+mkdir -p neo4j/data/databases/
+mv recommendations.db neo4j/data/databases/graph.db
+docker run \
+  --publish=7474:7474 --publish=7687:7687 \
+  --volume=./neo4j/data:/data \
+  neo4j:3.2.3
+``` 
+
+```
+export NEO4J_URI=bolt://localhost:7687/
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=<your value here>
+```
+
 ## What is GRAND stack?
 
 **G**raphQL, **R**eact, **A**pollo, **N**eo4j **D**atabase. The GRAND stack is a combination of modern technologies for building scalable applications for the web and mobile.
-
-## **G**raphQL
-
-GraphQL is a query language and runtime for building APIs. Instead of defining many endpoints and the data returned by each endpoint, GraphQL uses a well-defined schema and type system to describe what data is available from the API. Using GraphQL, clients query for only the data they require.
-
-## **R**eact
-
-React is a JavaScript library for building user interfaces. React is declarative and component-based, allowing for encapsulating UI logic in components that can be reused, composed, and combined to build powerful user interfaces.
-
-## **A**pollo
-
-Apollo is a suite of open source tools for working with GraphQL. Apollo Client is a flexible, production ready GraphQL client for React and native apps.
-
-## **N**eo4j **D**atabase
-
-Neo4j is a scalable native graph database that allows for flexible intuitive data modeling and fast near real time querying using Cypher, the query language for graphs.
 
 ## Overview
 
